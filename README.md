@@ -93,6 +93,8 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r ContextAgent/requirements.txt
+# This package is required by the automatically discovered calendar tools.
+python -m pip install gcsa==2.5.1
 python -m pip install -e ContextAgent
 python -m pip install -e ContextAgent/LLaMA-Factory
 ```
