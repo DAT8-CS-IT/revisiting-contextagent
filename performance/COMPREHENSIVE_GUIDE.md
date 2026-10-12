@@ -688,7 +688,7 @@ performance/
 ../sft_training_with_metrics.py      ← Wrapper for SFT training (called by sft_exp.sh)
 ../sft_eval_with_metrics.py          ← Wrapper for SFT evaluation (called by sft_eval.sh)
 
-AiLab_scripts/
+scripts/
 ├── icl_sandbox.sh                   ← MODIFIED: Calls metrics wrapper
 ├── sft_exp.sh                       ← MODIFIED: Calls metrics wrapper
 └── sft_eval.sh                      ← MODIFIED: Calls metrics wrapper

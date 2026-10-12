@@ -7,7 +7,7 @@ usage() {
 Run one LoRA/SFT training job locally.
 
 Usage:
-  run_sft_train_local.sh CONFIG MODEL [THINK] [PERSONAS]
+  run_sft_train.sh CONFIG MODEL [THINK] [PERSONAS]
 
 CONFIG is the training configuration name or path accepted by
 sft_training_with_metrics.py, for example qwen_lora_sft.

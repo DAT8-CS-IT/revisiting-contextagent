@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # =============================================================================
-# Script: generate_results_table.sh
+# Script: format_results.sh
 # Purpose: Convert CSV predictions into terminal tables and/or LaTeX format
-# Usage: ./generate_results_table.sh [OPTIONS]
+# Usage: ./format_results.sh [OPTIONS]
 # =============================================================================
 
 set -euo pipefail

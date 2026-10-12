@@ -7,10 +7,10 @@ usage() {
 Run one SFT evaluation locally.
 
 Usage:
-  run_sft_eval_local.sh CONFIG MODEL [THINK] [PERSONAS] [PORT] [MODE]
+  run_sft_eval.sh CONFIG MODEL [THINK] [PERSONAS] [PORT] [MODE]
 
 Example:
-  run_sft_eval_local.sh \
+  run_sft_eval.sh \
     experiments/configs/cab/inference/qwen_lora_sft.yaml \
     qwen7b w_t w_p 8009 sandbox
 

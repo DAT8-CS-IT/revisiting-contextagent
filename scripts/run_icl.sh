@@ -7,10 +7,10 @@ usage() {
 Run one ICL evaluation locally.
 
 Usage:
-  run_icl_local.sh MODEL [ZS] [THINK] [PERSONAS] [OLLAMA_PORT]
+  run_icl.sh MODEL [ZS] [THINK] [PERSONAS] [OLLAMA_PORT]
 
 Example:
-  run_icl_local.sh deepseek-r1:7b false w_t w_p 11434
+  run_icl.sh deepseek-r1:7b false w_t w_p 11434
 
 Ollama must be installed and running locally. Set START_OLLAMA=1 to start
 an Ollama server in this script; the process is stopped when the script exits.
