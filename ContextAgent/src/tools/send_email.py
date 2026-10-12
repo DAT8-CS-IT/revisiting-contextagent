@@ -3,7 +3,8 @@ from pathlib import Path
 from email.utils import parseaddr
 import config
 
-OUTBOX = Path("data/tools/outbox.json")
+CONTEXT_AGENT_ROOT = Path(__file__).resolve().parents[2]
+OUTBOX = CONTEXT_AGENT_ROOT / "data" / "tools" / "outbox.json"
 
 def _valid_email(addr: str) -> bool:
     # More robust than common regex: use standard library parsing + basic structure check

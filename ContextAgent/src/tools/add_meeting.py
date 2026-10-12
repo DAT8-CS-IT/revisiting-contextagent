@@ -3,7 +3,8 @@ from pathlib import Path
 from datetime import datetime, timedelta
 import config
 
-DB_PATH = Path("data/tools/meetings_db.json")
+CONTEXT_AGENT_ROOT = Path(__file__).resolve().parents[2]
+DB_PATH = CONTEXT_AGENT_ROOT / "data" / "tools" / "meetings_db.json"
 
 def _load_db() -> dict:
     # Load the meeting database from file

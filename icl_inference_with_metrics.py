@@ -134,7 +134,9 @@ def run_icl_with_metrics():
     
     # Print summary and save metrics
     collector.print_summary()
-    metrics_file = collector.save_results(output_dir="../performance/results")
+    metrics_file = collector.save_results(
+        output_dir=str(Path(__file__).resolve().parent / "performance" / "results")
+    )
     
     print(f"\n[METRICS] Results saved to: {metrics_file}")
     print(f"[METRICS] Total experiment time: {overall_duration:.2f}s")

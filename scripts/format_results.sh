@@ -12,7 +12,8 @@ set -euo pipefail
 # Configuration & Defaults
 # ============================================================================
 
-RESULTS_DIR="Reliable-Action-Recommendations-in-LLM-Based-Adaptive-Systems-/ContextAgent/results/cab/scores"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RESULTS_DIR="$REPO_DIR/ContextAgent/results/cab/scores"
 OUTPUT_FORMAT="terminal"  # terminal, latex, both
 DATASET="cab"
 METHODS="icl"             # icl, sft, or "both"
