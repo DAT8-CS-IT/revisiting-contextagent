@@ -75,14 +75,19 @@ def run_icl_with_metrics():
     
     # Load prompts and data (same as original)
     base_prompt = load_prompts(args.zs, args.think)
-    train_path = f"data/{args.dataset}/{args.dataset}_train.json"
-    train_ds = load_json(train_path)
+    context_agent_root = Path(__file__).resolve().parent / "ContextAgent"
+    train_path = (
+        context_agent_root / "data" / args.dataset / f"{args.dataset}_train.json"
+    )
+    train_ds = load_json(str(train_path))
     sys_prompt, fewshot_keys = build_system_prompt(
         base_prompt, args.zs, train_ds, args.n_fewshot, args.think, args.personas
     )
     
-    test_path = f"data/{args.dataset}/{args.dataset}_test.json"
-    test_ds = load_json(test_path)
+    test_path = (
+        context_agent_root / "data" / args.dataset / f"{args.dataset}_test.json"
+    )
+    test_ds = load_json(str(test_path))
     
     # Main inference loop with metrics
     keys_list = list(test_ds.keys())
