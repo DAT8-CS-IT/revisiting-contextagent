@@ -121,8 +121,6 @@ which python
 python --version
 python -m pip install --upgrade pip
 python -m pip install -r ContextAgent/requirements-icl.txt
-# Install the local ICL package without re-reading the full training manifest.
-python -m pip install --no-deps -e ContextAgent
 ```
 
 On Windows PowerShell, activate the environment with
@@ -140,10 +138,19 @@ Verify the two imports that are needed during tool discovery:
 python -c "import tqdm, dateparser; from gcsa.google_calendar import GoogleCalendar; print('Core tool dependencies are installed')"
 ```
 
+The smoke-test runner imports the repository code directly, so it does not
+need an editable installation of `ContextAgent`. This avoids installing the
+full training package metadata and prevents misleading warnings about omitted
+packages such as `accelerate`, `datasets`, and `peft`.
+
 The smoke test uses `requirements-icl.txt`, which avoids the CUDA training
 stack and supports Python 3.13. Do not run `pip check` after this lightweight
 installation: the package metadata for the full training environment contains
 dependencies that are intentionally not installed for the smoke test.
+If you already installed the package editable while following an older
+revision of this guide, remove that metadata-only installation with
+`python -m pip uninstall -y contextagent` and continue; do not uninstall the
+dependencies from `requirements-icl.txt`.
 
 For the complete training and SFT environment, use Python 3.10--3.12.
 The following example uses Python 3.12 explicitly; use `python3.10` or
