@@ -33,9 +33,57 @@ scripts/                      Local experiment and result-formatting scripts
 Model weights, checkpoints, caches, credentials, and runtime logs are not
 included. Download the required base models from their original model hosts.
 
-## 1. Install
+## 1. Install prerequisites
 
-The recommended setup uses Python 3.10 and a virtual environment:
+The repository requires Python 3.10 or newer, Git, `curl`, and a virtual
+environment. The ICL workflow also requires Ollama. Full SFT training,
+pruning, and knowledge distillation require a CUDA-capable NVIDIA GPU; the
+smoke test and ICL evaluation can run on a CPU if the selected Ollama model
+fits.
+
+On Debian or Ubuntu, install the system prerequisites with:
+
+```bash
+sudo apt update
+sudo apt install -y git curl python3 python3-venv python3-pip zstd
+```
+
+`zstd` is required by the Ollama installer. On Fedora/RHEL, use
+`sudo dnf install git curl python3 python3-pip zstd`; on Arch Linux, use
+`sudo pacman -S git curl python python-pip zstd`.
+
+On macOS, install Git and Python with
+[Homebrew](https://brew.sh/), then install the Ollama desktop application:
+
+```bash
+brew install python git
+```
+
+On Windows, install Git, Python, and Ollama using their official installers:
+[Git](https://git-scm.com/download/win),
+[Python](https://www.python.org/downloads/windows/), and
+[Ollama](https://ollama.com/download). Run the commands below in Git Bash or
+PowerShell, adapting `python3` to `python` if necessary.
+
+Install Ollama separately. On Linux, run:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+On macOS or Windows, install the Ollama desktop application from
+[ollama.com/download](https://ollama.com/download). Verify the installation:
+
+```bash
+ollama --version
+```
+
+If the command is not found after installation, open a new terminal so that
+your `PATH` is refreshed.
+
+## 2. Install the project
+
+Clone the repository and create a Python virtual environment:
 
 ```bash
 git clone git@github.com:DAT8-CS-IT/revisiting-contextagent.git
@@ -49,6 +97,9 @@ python -m pip install -e ContextAgent
 python -m pip install -e ContextAgent/LLaMA-Factory
 ```
 
+On Windows PowerShell, activate the environment with
+`.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate`.
+
 The default installation intentionally excludes PyAV because it is only
 needed for multimedia model inputs and may require system FFmpeg development
 libraries. The text-only experiments in this repository do not need it. If
@@ -61,23 +112,6 @@ python -m pip install -r ContextAgent/requirements-audio.txt
 
 For the pinned environment, use
 [`ContextAgent/environment.yml`](ContextAgent/environment.yml) instead.
-Training and SFT evaluation require a CUDA-capable GPU. ICL evaluation uses
-[Ollama](https://ollama.com/) and can run on a CPU if the selected model fits.
-
-Install Ollama separately before running ICL. On Linux, the official
-installation command is:
-
-```bash
-curl -fsSL https://ollama.com/install.sh | sh
-```
-
-On macOS or Windows, install the Ollama desktop application from
-[ollama.com/download](https://ollama.com/download). Verify that it is
-available in your shell:
-
-```bash
-ollama --version
-```
 
 If a model requires authentication, set the token only in your local shell:
 
@@ -87,13 +121,20 @@ export HF_TOKEN="your-hugging-face-token"
 
 Never commit credentials.
 
-## 2. Run a laptop smoke test
+## 3. Run a smoke test
 
-Before running the full evaluation, test the complete wiring on two samples.
-The small Ollama model keeps this practical on a laptop:
+Before running a full evaluation, test the complete wiring on two samples.
+The small Ollama model keeps this practical on a laptop. Start Ollama in one
+terminal:
 
 ```bash
 ollama serve
+```
+
+In a second terminal, from the repository root, download the small model and
+run the smoke test:
+
+```bash
 ollama pull qwen2.5:0.5b
 
 scripts/run_icl.sh qwen2.5:0.5b false w_t w_p 11434 2
@@ -111,7 +152,7 @@ connectivity, imports, dataset loading, inference, incremental result saving,
 and metric collection. Score calculation is intentionally skipped because a
 two-sample result is not a meaningful evaluation score.
 
-## 3. Run the full ICL evaluation
+## 4. Run the full ICL evaluation
 
 Install and start Ollama, then run one evaluation:
 
@@ -125,7 +166,7 @@ scripts/run_icl.sh deepseek-r1:7b false w_t w_p 11434
 The script runs CAB inference, records performance metrics, and calculates
 evaluation scores. Run `scripts/run_icl.sh --help` to see all arguments.
 
-## 4. Run SFT training
+## 5. Run SFT training
 
 Make sure the base model and training data referenced by the configuration are
 available:
@@ -136,7 +177,7 @@ scripts/run_sft_train.sh qwen_lora_sft qwen7b
 
 Run `scripts/run_sft_train.sh --help` for the argument description.
 
-## 5. Run SFT evaluation
+## 6. Run SFT evaluation
 
 After training or downloading the corresponding adapter:
 
