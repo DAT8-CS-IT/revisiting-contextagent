@@ -49,6 +49,16 @@ python -m pip install -e ContextAgent
 python -m pip install -e ContextAgent/LLaMA-Factory
 ```
 
+The default installation intentionally excludes PyAV because it is only
+needed for multimedia model inputs and may require system FFmpeg development
+libraries. The text-only experiments in this repository do not need it. If
+you need multimedia support, install it separately on a system with FFmpeg 7,
+`pkg-config`, and a C compiler:
+
+```bash
+python -m pip install -r ContextAgent/requirements-audio.txt
+```
+
 For the pinned environment, use
 [`ContextAgent/environment.yml`](ContextAgent/environment.yml) instead.
 Training and SFT evaluation require a CUDA-capable GPU. ICL evaluation uses

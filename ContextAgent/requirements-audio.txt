@@ -1,0 +1,5 @@
+# Optional multimedia support for LLaMA-Factory.
+#
+# PyAV requires system FFmpeg development libraries when a compatible wheel is
+# unavailable. It is not needed for the CAB text-only ICL/SFT workflows.
+av==14.4.0

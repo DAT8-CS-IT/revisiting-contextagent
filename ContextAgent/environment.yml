@@ -37,7 +37,6 @@ dependencies:
       - async-timeout==4.0.3
       - attrs==25.3.0
       - audioread==3.0.1
-      - av==14.4.0
       - beautiful-date==2.3.0
       - beautifulsoup4==4.13.4
       - bert-score==0.3.13
