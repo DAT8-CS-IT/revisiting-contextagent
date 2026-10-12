@@ -44,6 +44,12 @@ def run_icl_with_metrics():
     parser.add_argument("--personas", type=str, default="w_p", help="w_p, wo_p")
     parser.add_argument("--think", type=str, default="w_t", help="w_t, wo_t")
     parser.add_argument("--n_fewshot", type=int, default=10)
+    parser.add_argument(
+        "--max_samples",
+        type=int,
+        default=None,
+        help="Evaluate only the first N test samples (useful for a local smoke test).",
+    )
     parser.add_argument("--ollama_host", type=str, default=None, 
                         help="Ollama host:port (e.g., 127.0.0.1:11434)")
     args = parser.parse_args()
@@ -80,6 +86,10 @@ def run_icl_with_metrics():
     
     # Main inference loop with metrics
     keys_list = list(test_ds.keys())
+    if args.max_samples is not None:
+        if args.max_samples < 1:
+            parser.error("--max_samples must be at least 1")
+        keys_list = keys_list[:args.max_samples]
     total = len(keys_list)
     sep = "=" * 80
     

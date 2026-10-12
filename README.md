@@ -62,7 +62,24 @@ export HF_TOKEN="your-hugging-face-token"
 
 Never commit credentials.
 
-## 2. Run ICL evaluation
+## 2. Run a laptop smoke test
+
+Before running the full evaluation, test the complete wiring on two samples.
+The small Ollama model keeps this practical on a laptop:
+
+```bash
+ollama serve
+ollama pull qwen2.5:0.5b
+
+scripts/run_icl.sh qwen2.5:0.5b false w_t w_p 11434 2
+```
+
+The final argument limits the run to two samples. This checks Ollama
+connectivity, imports, dataset loading, inference, incremental result saving,
+and metric collection. Score calculation is intentionally skipped because a
+two-sample result is not a meaningful evaluation score.
+
+## 3. Run the full ICL evaluation
 
 Install and start Ollama, then run one evaluation:
 
@@ -76,7 +93,7 @@ scripts/run_icl.sh deepseek-r1:7b false w_t w_p 11434
 The script runs CAB inference, records performance metrics, and calculates
 evaluation scores. Run `scripts/run_icl.sh --help` to see all arguments.
 
-## 3. Run SFT training
+## 4. Run SFT training
 
 Make sure the base model and training data referenced by the configuration are
 available:
@@ -87,7 +104,7 @@ scripts/run_sft_train.sh qwen_lora_sft qwen7b
 
 Run `scripts/run_sft_train.sh --help` for the argument description.
 
-## 4. Run SFT evaluation
+## 5. Run SFT evaluation
 
 After training or downloading the corresponding adapter:
 
@@ -100,7 +117,7 @@ scripts/run_sft_eval.sh \
 Run `scripts/run_sft_eval.sh --help` for all options. The evaluation uses
 batch size 1, matching the reported experiments.
 
-## 5. Format existing results
+## 6. Format existing results
 
 To format CSV metrics that have already been generated:
 
