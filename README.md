@@ -93,14 +93,27 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r ContextAgent/requirements.txt
-# This package is required by the automatically discovered calendar tools.
-python -m pip install gcsa==2.5.1
-python -m pip install -e ContextAgent
-python -m pip install -e ContextAgent/LLaMA-Factory
+# These are required by the automatically discovered calendar tools.
+python -m pip install gcsa==2.5.1 dateparser==1.4.3
+# Dependencies were installed above; do not resolve the large manifests again.
+python -m pip install --no-deps -e ContextAgent
+python -m pip install --no-deps -e ContextAgent/LLaMA-Factory
 ```
 
 On Windows PowerShell, activate the environment with
 `.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate`.
+
+Verify the two imports that are needed during tool discovery:
+
+```bash
+python -c "import dateparser; from gcsa.google_calendar import GoogleCalendar; print('Core tool dependencies are installed')"
+python -m pip check
+```
+
+If the requirements command reports an error, do not continue to the smoke
+test. Fix that error first or use Python 3.10--3.12, which are the versions
+used for the release environment. If installation was interrupted, rerun the
+same commands with the virtual environment activated.
 
 The default installation intentionally excludes PyAV because it is only
 needed for multimedia model inputs and may require system FFmpeg development
