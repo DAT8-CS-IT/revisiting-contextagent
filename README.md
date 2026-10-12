@@ -35,11 +35,13 @@ included. Download the required base models from their original model hosts.
 
 ## 1. Install prerequisites
 
-The repository requires Python 3.10 or newer, Git, `curl`, and a virtual
-environment. The ICL workflow also requires Ollama. Full SFT training,
-pruning, and knowledge distillation require a CUDA-capable NVIDIA GPU; the
-smoke test and ICL evaluation can run on a CPU if the selected Ollama model
-fits.
+The repository requires Git, `curl`, and a virtual environment. The
+lightweight ICL smoke test supports Python 3.10 or newer, including Python
+3.13. The full training, SFT, pruning, and knowledge-distillation
+environment **requires Python 3.10, 3.11, or 3.12**; it is not compatible
+with Python 3.13 because of the pinned NumPy and training dependencies. Full
+training also requires a CUDA-capable NVIDIA GPU. The smoke test and ICL
+evaluation can run on a CPU if the selected Ollama model fits.
 
 On Debian or Ubuntu, install the system prerequisites with:
 
@@ -48,22 +50,46 @@ sudo apt update
 sudo apt install -y git curl python3 python3-venv python3-pip zstd
 ```
 
+For the full environment, install a supported interpreter explicitly. For
+example, on Ubuntu 22.04 or newer:
+
+```bash
+sudo apt install -y python3.12 python3.12-venv python3.12-dev
+```
+
+If your distribution does not provide that package, use the
+[Python downloads](https://www.python.org/downloads/) or
+[deadsnakes PPA](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa) for
+Ubuntu. Verify the interpreter before creating the environment:
+
+```bash
+python3.12 --version
+```
+
 `zstd` is required by the Ollama installer. On Fedora/RHEL, use
-`sudo dnf install git curl python3 python3-pip zstd`; on Arch Linux, use
-`sudo pacman -S git curl python python-pip zstd`.
+`sudo dnf install git curl python3 python3-pip zstd`. If available in your
+Fedora release, install a supported version with
+`sudo dnf install python3.12 python3.12-devel`; otherwise use
+[pyenv](https://github.com/pyenv/pyenv) or the official Python installer.
+On Arch Linux, use `sudo pacman -S git curl python python-pip zstd` and
+install a 3.12 interpreter through
+[pyenv](https://github.com/pyenv/pyenv) if the system Python is newer.
 
 On macOS, install Git and Python with
 [Homebrew](https://brew.sh/), then install the Ollama desktop application:
 
 ```bash
-brew install python git
+brew install python@3.12 git
 ```
+
+Use `python3.12` when creating the full environment.
 
 On Windows, install Git, Python, and Ollama using their official installers:
 [Git](https://git-scm.com/download/win),
 [Python](https://www.python.org/downloads/windows/), and
 [Ollama](https://ollama.com/download). Run the commands below in Git Bash or
-PowerShell, adapting `python3` to `python` if necessary.
+PowerShell, and choose Python 3.12 (or 3.10/3.11) in the Python installer.
+Enable **Add Python to PATH**.
 
 Install Ollama separately. On Linux, run:
 
@@ -119,15 +145,30 @@ stack and supports Python 3.13. Do not run `pip check` after this lightweight
 installation: the package metadata for the full training environment contains
 dependencies that are intentionally not installed for the smoke test.
 
-For the complete training and SFT environment, use Python 3.10--3.12,
-install `ContextAgent/requirements.txt`, and then install both local packages
-with their dependencies:
+For the complete training and SFT environment, use Python 3.10--3.12.
+The following example uses Python 3.12 explicitly; use `python3.10` or
+`python3.11` if that is the supported interpreter you installed. Remove any
+old environment created with Python 3.13 first:
 
 ```bash
+deactivate 2>/dev/null || true
+rm -rf .venv
+python3.12 -m venv .venv
+source .venv/bin/activate
+python --version
+python -m pip install --upgrade pip
 python -m pip install -r ContextAgent/requirements.txt
 python -m pip install -e ContextAgent
 python -m pip install -e ContextAgent/LLaMA-Factory
 python -m pip check
+```
+
+On Windows PowerShell, replace the environment creation and activation
+commands with:
+
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\Activate.ps1
 ```
 
 The default installation intentionally excludes PyAV because it is only
