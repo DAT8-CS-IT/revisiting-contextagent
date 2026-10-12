@@ -94,11 +94,9 @@ source .venv/bin/activate
 which python
 python --version
 python -m pip install --upgrade pip
-python -m pip install -r ContextAgent/requirements.txt
-# These are required by the automatically discovered calendar tools.
-python -m pip install gcsa==2.5.1 dateparser==1.4.3
-python -m pip install -e ContextAgent
-python -m pip install -e ContextAgent/LLaMA-Factory
+python -m pip install -r ContextAgent/requirements-icl.txt
+# Install the local ICL package without re-reading the full training manifest.
+python -m pip install --no-deps -e ContextAgent
 ```
 
 On Windows PowerShell, activate the environment with
@@ -113,14 +111,24 @@ environment before installing packages. Do not continue if pip prints
 Verify the two imports that are needed during tool discovery:
 
 ```bash
-python -c "import dateparser; from gcsa.google_calendar import GoogleCalendar; print('Core tool dependencies are installed')"
-python -m pip check
+python -c "import tqdm, dateparser; from gcsa.google_calendar import GoogleCalendar; print('Core tool dependencies are installed')"
 ```
 
-If the requirements command reports an error, do not continue to the smoke
-test. Fix that error first or use Python 3.10--3.12, which are the versions
-used for the release environment. If installation was interrupted, rerun the
-same commands with the virtual environment activated.
+The smoke test uses `requirements-icl.txt`, which avoids the CUDA training
+stack and supports Python 3.13. Do not run `pip check` after this lightweight
+installation: the package metadata for the full training environment contains
+dependencies that are intentionally not installed for the smoke test.
+
+For the complete training and SFT environment, use Python 3.10--3.12,
+install `ContextAgent/requirements.txt`, and then install both local packages
+with their dependencies:
+
+```bash
+python -m pip install -r ContextAgent/requirements.txt
+python -m pip install -e ContextAgent
+python -m pip install -e ContextAgent/LLaMA-Factory
+python -m pip check
+```
 
 The default installation intentionally excludes PyAV because it is only
 needed for multimedia model inputs and may require system FFmpeg development

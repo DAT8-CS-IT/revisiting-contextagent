@@ -1,0 +1,26 @@
+# Dependencies for the text-only Ollama ICL evaluation and smoke test.
+#
+# This file intentionally excludes CUDA training dependencies and the full
+# reproducibility stack. It supports Python 3.13, where the full environment's
+# NumPy 1.26.4 pin cannot coexist with langchain-community.
+numpy>=2.1,<3
+pandas>=2.2
+scikit-learn>=1.6
+scipy>=1.15
+torch>=2.7
+transformers>=4.52
+bert-score>=0.3.13
+tqdm>=4.67
+ollama>=0.5.1
+requests>=2.32
+geocoder>=1.38
+gcsa>=2.5.1
+dateparser>=1.4.3
+google-api-python-client>=2.170
+google-auth-httplib2>=0.2
+google-auth-oauthlib>=1.2
+googlesearch-python>=1.3
+ddgs>=9
+yfinance>=0.2
+langchain-community>=0.3.24
+openai>=1.82
