@@ -1,17 +1,59 @@
-# Towards More Efficient Proactive Agents
+# Revisiting ContextAgent
+
+## A Reproducibility Study of Context-Aware Proactive LLM Agents under Resource Constraints
 
 This repository contains the code and experiment configurations for our
-reproducibility study of proactive LLM agents. It combines ContextAgent
-inference, LoRA/SFT training and evaluation, performance instrumentation, and
-knowledge-distillation utilities.
+reproducibility study of ContextAgent, a context-aware proactive LLM agent. It
+includes ICL inference, LoRA/SFT training and evaluation, performance
+instrumentation, and knowledge-distillation utilities.
 
 ## Authors
 
-Alexander Guldberg Redder, Andreas Svanberg Hummelmose, Beltrán J. Aceves Gil,
-Eduard Brahas, Mahsa Hemmatpanah, Rasmus Præstegaard Pedersen, and Peter Dolog.
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Role</th>
+    <th>Contact</th>
+  </tr>
+  <tr>
+    <td>Alexander Guldberg Redder</td>
+    <td>Author</td>
+    <td><a href="mailto:aredde22@student.aau.dk">aredde22@student.aau.dk</a></td>
+  </tr>
+  <tr>
+    <td>Andreas Svanberg Hummelmose</td>
+    <td>Author</td>
+    <td><a href="mailto:ahumme22@student.aau.dk">ahumme22@student.aau.dk</a></td>
+  </tr>
+  <tr>
+    <td>Beltrán J. Aceves Gil</td>
+    <td>Author</td>
+    <td><a href="mailto:baceve25@student.aau.dk">baceve25@student.aau.dk</a></td>
+  </tr>
+  <tr>
+    <td>Eduard Brahas</td>
+    <td>Author</td>
+    <td><a href="mailto:ebraha25@student.aau.dk">ebraha25@student.aau.dk</a></td>
+  </tr>
+  <tr>
+    <td>Mahsa Hemmatpanah</td>
+    <td>Author</td>
+    <td><a href="mailto:mhemma25@student.aau.dk">mhemma25@student.aau.dk</a></td>
+  </tr>
+  <tr>
+    <td>Rasmus Præstegaard Pedersen</td>
+    <td>Author</td>
+    <td><a href="mailto:rpeder22@student.aau.dk">rpeder22@student.aau.dk</a></td>
+  </tr>
+  <tr>
+    <td>Peter Dolog</td>
+    <td>Supervisor and Associate Professor</td>
+    <td><a href="mailto:dolog@cs.aau.dk">dolog@cs.aau.dk</a></td>
+  </tr>
+</table>
 
-Peter Dolog is an Associate Professor at the Department of Computer Science,
-Aalborg University, Denmark, and is the project supervisor.
+All authors are affiliated with the Department of Computer Science, Aalborg
+University, Denmark. Peter Dolog is the project supervisor.
 
 ## Repository layout
 
@@ -26,7 +68,8 @@ Aalborg University, Denmark, and is the project supervisor.
 Model weights, checkpoints, caches, credentials, and runtime logs are
 intentionally not included in Git. Download the required base models from
 their original model hosts and place trained adapters at the paths referenced
-by the configuration files.
+by the configuration files. This keeps the repository small and avoids
+redistributing third-party model weights.
 
 ## Installation
 
@@ -51,6 +94,10 @@ For the complete pinned environment, see
 GPU is required for model training and local SFT evaluation. ICL evaluation
 uses [Ollama](https://ollama.com/) and can run on a CPU if the selected model
 fits.
+
+The commands below are the supported smoke-test and reproduction entry points.
+They have been designed to run outside SLURM and do not depend on the original
+cluster filesystem.
 
 Set credentials in the shell or in a local untracked `.env` file. Never add
 real credentials to Git:
