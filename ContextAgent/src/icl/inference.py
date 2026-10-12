@@ -1,0 +1,264 @@
+import sys, pathlib, json, argparse, random, ast, os, warnings
+from datetime import datetime
+from typing import Dict, Any, Tuple, List
+
+# Suppress google-api-core Python version warning
+warnings.filterwarnings("ignore", message=".*You are using a Python version.*google.api_core.*")
+# Add src directory to path for imports
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
+# Get ContextAgent root directory (parent of src/)
+CONTEXT_AGENT_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
+
+# progress bar
+from tqdm import tqdm
+
+import config
+from tool_registry import functions, process_function_call
+from utils import (
+    execute_tools_with_memory,
+    convert_sets_to_lists,
+    parse_proactive_agent_results,
+    ollama_inference,
+)
+import ollama
+
+random.seed(42)
+
+# =========================
+# Args & Config
+# =========================
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument("--mode", choices=["live", "sandbox"], default="sandbox")
+    p.add_argument("--model_base", type=str, default="qwen2.5:latest")
+    p.add_argument("--dataset", type=str, default="cab", help="cab, cab_lite, cab_ood")
+    p.add_argument("--zs", type=str, default="false", help="false, true")
+    p.add_argument("--personas", type=str, default="w_p", help="w_p, wo_p")
+    p.add_argument("--think", type=str, default="w_t", help="w_t, wo_t")
+    p.add_argument("--n_fewshot", type=int, default=10)
+    return p.parse_args()
+
+def apply_mode(mode: str):
+    """Propagate mode to all tools via config."""
+    try:
+        from config import set_mode
+        set_mode(mode)
+    except Exception:
+        config.MODE = mode
+
+# =========================
+# Data Loading & Prompt
+# =========================
+def load_json(path: str) -> Dict[str, Any]:
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def load_prompts(zs_flag: str, think: str) -> str:
+    if zs_flag == "true":
+        # Zero-shot: always use icl_zs.txt (no think)
+        path = CONTEXT_AGENT_ROOT / "prompt" / "baselines" / "icl_zs.txt"
+    else:
+        # Few-shot: choose based on think parameter
+        if think == "wo_t":
+            path = CONTEXT_AGENT_ROOT / "prompt" / "baselines" / "icl_fs_wo_t.txt"
+        else:
+            path = CONTEXT_AGENT_ROOT / "prompt" / "baselines" / "icl_fs.txt"
+    
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+def sanitize_demonstrations(samples: Dict[str, Any], think: str, personas: str) -> Dict[str, Any]:
+    """Drop fields to match your previous SFT-compatible setup."""
+    for k, ex in samples.items():
+        for fld in ("Response", "Tool planning", "Action"):
+            if fld in ex:
+                del ex[fld]
+        if think == "wo_t" and "Thoughts" in ex:
+            del ex["Thoughts"]
+        if personas == "wo_p" and "Personas" in ex:
+            del ex["Personas"]
+    return samples
+
+def build_system_prompt(base_prompt: str, zs_flag: str, train_ds: Dict[str, Any],
+                        n_fewshot: int, think: str, personas: str) -> Tuple[str, List[str]]:
+    keys = list(train_ds.keys())
+    fewshot_keys = random.sample(keys, n_fewshot) if n_fewshot > 0 else []
+    fewshots = {k: train_ds[k] for k in fewshot_keys}
+    fewshots = sanitize_demonstrations(fewshots, think, personas)
+    print("Selected samples:", fewshot_keys)
+
+    if zs_flag == "true":
+        return base_prompt, fewshot_keys
+
+    examples_str = json.dumps(fewshots, ensure_ascii=False, indent=4)
+    filled = base_prompt.replace("{Examples}", examples_str)
+    return filled, fewshot_keys
+
+# =========================
+# Per-sample Execution
+# =========================
+def get_contextual_info(dataset_name: str, sample: Dict[str, Any]) -> str:
+    if dataset_name in ("cab", "cab_ood"):
+        return sample["Context information"]
+    if dataset_name == "cab_lite":
+        return sample["Rawdata Context"]
+    return sample.get("Context information", "")
+
+def parse_tool_spec(tools_str: str) -> List[Dict[str, Any]]:
+    if tools_str == "None":
+        return []
+    try:
+        parsed = ast.literal_eval(tools_str)
+        return parsed if isinstance(parsed, list) else []
+    except Exception:
+        return []
+
+def run_tools(json_tool: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """Two-stage executor + memory (no-params first, then param tools)."""
+    memory = {"now_iso": datetime.now().isoformat()}
+    results_tool = execute_tools_with_memory(json_tool, process_function_call, memory)
+    return results_tool, memory
+
+def summarize_with_llm(model_base: str, contextual_info: str, personas_str: str,
+                       thoughts: str, results_tool: Any, personas_flag: str) -> str:
+    with open(CONTEXT_AGENT_ROOT / "prompt" / "prompt_summarize.txt", "r", encoding="utf-8") as f:
+        prompt_summarize = f.read()
+
+    if personas_flag == "wo_p":
+        content = (
+            "# Sensory Contexts:\n" + contextual_info +
+            "\n\n# Thoughts:\n" + thoughts +
+            "\n\n# Tool results:\n" + str(results_tool)
+        )
+    else:
+        content = (
+            "# Sensory Contexts:\n" + contextual_info +
+            "\n\n# Persona Contexts:\n" + personas_str +
+            "\n\n# Thoughts:\n" + thoughts +
+            "\n\n# Tool results:\n" + str(results_tool)
+        )
+    messages = [
+        {"role": "system", "content": prompt_summarize},
+        {"role": "user", "content": content},
+    ]
+
+    if config.MODE == "sandbox":
+        return "sandbox outputs."
+
+    resp = ollama.chat(model=model_base, messages=messages)
+    reply = resp["message"]["content"]
+    return reply
+
+def run_single_sample(sample_key: str, sample: Dict[str, Any], args, sys_prompt: str, dataset_name: str) -> Dict[str, Any]:
+    print("Sample ID:\n", sample_key)
+    print("=" * 50)
+
+    contextual_info = get_contextual_info(dataset_name, sample)
+    personas_str = ".".join(sample.get("Personas", []))
+    print("\033[1;36mSensory Context:\033[0m\n", contextual_info)
+    print("=" * 50)
+
+    # Proactive inference
+    messages = [{"role": "system", "content": sys_prompt}]
+    if args.personas == "w_p":
+        messages.append({"role": "user", "content": "Sensory Context:\n" + contextual_info + "\nPersona Context:\n" + personas_str})
+    else:
+        messages.append({"role": "user", "content": contextual_info})
+    result, ollama_metrics = ollama_inference(args.model_base, messages)
+    print("\033[1;36mProactive LLM Agent Predictions:\033[0m\n", result)
+    print("=" * 50)
+
+    # Parse planning output
+    thoughts, p_idx, p_score, actions, tools_str = parse_proactive_agent_results(result)
+    print("\033[1;36mThoughts:\033[0;36m\n", thoughts, "\033[0m")
+    print("\033[1;34mProactive Index:\033[0;34m\n", p_idx, "\033[0m")
+    print("\033[1;34mProactive Score:\033[0;34m\n", p_score, "\033[0m")
+    print("\033[1;37mActions:\033[0;37m\n", actions, "\033[0m")
+    print("\033[1;35mTools:\033[0;35m\n", tools_str, "\033[0m")
+
+    # Tool calling
+    if tools_str != "None":
+        json_tool = parse_tool_spec(tools_str)
+        results_tool, memory = run_tools(json_tool)
+        print(50 * "=")
+        print("\033[1;36mTool Results:\033[0m\n", results_tool)
+        print(50 * "=")
+        print("\033[1;36mMemory State:\033[0m\n", memory)
+
+        response = summarize_with_llm(args.model_base, contextual_info, personas_str, thoughts, results_tool, args.personas)
+        print(50 * "=")
+        print("\033[1;36mProactive Response:\033[0m\n", response)
+    else:
+        results_tool = "None"
+        response = "None"
+
+    return {
+        "thoughts": thoughts,
+        "proactive_idx": p_idx,
+        "proactive_score": p_score,
+        "actions": actions,
+        "tools": tools_str,
+        "tools_results": results_tool,
+        "response": response,
+    }
+
+
+def save_results_incremental(ds: Dict[str, Any], args) -> str:
+    """Save the full dataset (with predictions) after each sample."""
+    safe_ds = convert_sets_to_lists(ds)
+    if args.zs == "true":
+        path = CONTEXT_AGENT_ROOT / "results" / args.dataset / "predictions" / "icl" / f"pred_{args.model_base}_zs.json"
+    else:
+        path = CONTEXT_AGENT_ROOT / "results" / args.dataset / "predictions" / "icl" / f"pred_{args.model_base}_fs_{args.n_fewshot}_{args.personas}_{args.think}.json"
+    os.makedirs(path.parent, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(safe_ds, f, ensure_ascii=False, indent=4)
+    return str(path)
+
+
+# =========================
+# Main Orchestration
+# =========================
+def main():
+    args = parse_args()
+    apply_mode(args.mode)
+
+    print(f"[main] MODE = {config.MODE}")
+    print(f"[main] Loaded tools: {', '.join(sorted(functions.keys()))}")
+
+    base_prompt = load_prompts(args.zs, args.think)
+
+    # Train (for few-shot examples)
+    train_path = CONTEXT_AGENT_ROOT / "data" / args.dataset / f"{args.dataset}_train.json"
+    train_ds = load_json(str(train_path))
+    sys_prompt, fewshot_keys = build_system_prompt(base_prompt, args.zs, train_ds, args.n_fewshot, args.think, args.personas)
+    print("Prompt ready with few-shots:", fewshot_keys)
+
+    # Test set
+    test_path = CONTEXT_AGENT_ROOT / "data" / args.dataset / f"{args.dataset}_test.json"
+    test_ds = load_json(str(test_path))
+
+    # ===== Clear per-sample separators + progress bar =====
+    keys_list = list(test_ds.keys())
+    total = len(keys_list)
+    sep = "=" * 80
+
+    for idx, k in enumerate(tqdm(keys_list, total=total, desc="Evaluating samples", unit="sample"), start=1):
+        # Header for this sample (use tqdm.write to not break the bar)
+        tqdm.write(f"\n{sep}\n[Sample {idx}/{total}] ID: {k}\n{sep}")
+
+        preds, metrics = run_single_sample(k, test_ds[k], args, sys_prompt, args.dataset)
+        test_ds[k]["predictions"] = preds
+        test_ds[k]["metrics"] = metrics
+
+        # Save incrementally (same behavior as your original script)
+        save_path = save_results_incremental(test_ds, args)
+        tqdm.write(f"[main] Saved: {save_path}")
+        # Footer for this sample
+        tqdm.write(f"{'-'*80}\n[Completed] {k} ({idx}/{total})\n{'-'*80}")
+
+    print("\nAll samples finished ✅")
+
+if __name__ == "__main__":
+    main()
