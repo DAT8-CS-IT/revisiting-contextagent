@@ -91,17 +91,24 @@ cd revisiting-contextagent
 
 python3 -m venv .venv
 source .venv/bin/activate
+which python
+python --version
 python -m pip install --upgrade pip
 python -m pip install -r ContextAgent/requirements.txt
 # These are required by the automatically discovered calendar tools.
 python -m pip install gcsa==2.5.1 dateparser==1.4.3
-# Dependencies were installed above; do not resolve the large manifests again.
-python -m pip install --no-deps -e ContextAgent
-python -m pip install --no-deps -e ContextAgent/LLaMA-Factory
+python -m pip install -e ContextAgent
+python -m pip install -e ContextAgent/LLaMA-Factory
 ```
 
 On Windows PowerShell, activate the environment with
 `.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate`.
+
+The `which python` command must point to
+`.../revisiting-contextagent/.venv/bin/python`. If it points to
+`/usr/bin/python` or another system location, stop and activate the
+environment before installing packages. Do not continue if pip prints
+`Defaulting to user installation`.
 
 Verify the two imports that are needed during tool discovery:
 
