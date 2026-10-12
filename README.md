@@ -64,6 +64,21 @@ For the pinned environment, use
 Training and SFT evaluation require a CUDA-capable GPU. ICL evaluation uses
 [Ollama](https://ollama.com/) and can run on a CPU if the selected model fits.
 
+Install Ollama separately before running ICL. On Linux, the official
+installation command is:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+On macOS or Windows, install the Ollama desktop application from
+[ollama.com/download](https://ollama.com/download). Verify that it is
+available in your shell:
+
+```bash
+ollama --version
+```
+
 If a model requires authentication, set the token only in your local shell:
 
 ```bash
@@ -82,6 +97,13 @@ ollama serve
 ollama pull qwen2.5:0.5b
 
 scripts/run_icl.sh qwen2.5:0.5b false w_t w_p 11434 2
+```
+
+Keep `ollama serve` running in a separate terminal. Alternatively, let the
+runner start a temporary local server:
+
+```bash
+START_OLLAMA=1 scripts/run_icl.sh qwen2.5:0.5b false w_t w_p 11434 2
 ```
 
 The final argument limits the run to two samples. This checks Ollama
