@@ -1,0 +1,74 @@
+{
+ "Dense (released config, Table 4)": {
+  "n": 400,
+  "mean": 131.7925,
+  "median": 117.0,
+  "max": 327,
+  "ge1020": 0,
+  "ge1024": 0,
+  "noscore": 0
+ },
+ "Dense (LoRA run, Table 1, 5e-5)": {
+  "n": 400,
+  "mean": 129.6275,
+  "median": 114.0,
+  "max": 291,
+  "ge1020": 0,
+  "ge1024": 0,
+  "noscore": 0
+ },
+ "Structured magnitude 10%": {
+  "n": 400,
+  "mean": 463.17,
+  "median": 339.0,
+  "max": 947,
+  "ge1020": 0,
+  "ge1024": 0,
+  "noscore": 400
+ },
+ "Structured magnitude 30%": {
+  "n": 400,
+  "mean": 859.7475,
+  "median": 864.0,
+  "max": 900,
+  "ge1020": 0,
+  "ge1024": 0,
+  "noscore": 400
+ },
+ "Structured magnitude 50%": {
+  "n": 400,
+  "mean": 968.565,
+  "median": 968.5,
+  "max": 990,
+  "ge1020": 0,
+  "ge1024": 0,
+  "noscore": 400
+ },
+ "Structured activation 10%": {
+  "n": 400,
+  "mean": 134.535,
+  "median": 116.5,
+  "max": 299,
+  "ge1020": 0,
+  "ge1024": 0,
+  "noscore": 0
+ },
+ "Structured activation 30%": {
+  "n": 400,
+  "mean": 127.19,
+  "median": 103.5,
+  "max": 321,
+  "ge1020": 0,
+  "ge1024": 0,
+  "noscore": 2
+ },
+ "Structured activation 50%": {
+  "n": 400,
+  "mean": 167.9625,
+  "median": 102.0,
+  "max": 1048,
+  "ge1020": 15,
+  "ge1024": 13,
+  "noscore": 2
+ }
+}
