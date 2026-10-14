@@ -20,6 +20,12 @@
 | Qwen | 4-bit, 5e-5 | 1 | 20.0 | 8.2 | 27.8 | 32.8 | 0.0 | 11.2 |
 | Qwen | Combined, 16-bit | 3 | 0.2 | 7.5 | 42.4 | 33.3 | 0.1 | 16.5 |
 | Qwen | Combined, 4-bit | 3 | 0.0 | 7.2 | 43.8 | 33.0 | 0.0 | 16.1 |
+| Llama | Wanda 50, mask-aware recovery | 1 | 0.0 | 10.5 | 43.8 | 34.5 | 0.0 | 11.2 |
+| Llama | Wanda 2:4, mask-aware recovery | 1 | 0.0 | 12.5 | 39.0 | 39.8 | 0.2 | 8.5 |
+| Llama | Wanda 4:8, mask-aware recovery | 1 | 0.5 | 12.8 | 42.0 | 34.8 | 0.0 | 10.0 |
+| Llama | Magnitude 50, mask-aware recovery | 1 | 0.5 | 11.0 | 40.5 | 37.0 | 0.0 | 11.0 |
+| Llama | Magnitude 2:4, mask-aware recovery | 1 | 0.2 | 12.2 | 41.8 | 35.0 | 0.0 | 10.8 |
+| Llama | Magnitude 4:8, mask-aware recovery | 1 | 0.0 | 11.8 | 41.5 | 37.0 | 0.0 | 9.8 |
 | Small (2048 tokens) | Llama-3.2-1B, r=32 | 1 | 0.0 | 13.0 | 42.0 | 35.5 | 0.0 | 9.5 |
 | Small (2048 tokens) | DeepSeek-R1-1.5B, r=32 | 1 | 0.2 | 14.5 | 39.2 | 37.5 | 0.5 | 8.0 |
 | Small (2048 tokens) | Qwen2.5-1.5B, r=32 | 1 | 0.0 | 7.5 | 44.2 | 37.8 | 0.0 | 10.5 |
@@ -62,6 +68,12 @@
 | Qwen | 4-bit, 5e-5 | 0.882 / -- | 0.495 / 0.361 | 0.505 / 0.545 | 0.507 / 0.688 |
 | Qwen | Combined, 16-bit | 0.902 / -- | 0.597 / 0.457 | 0.631 / 0.659 | 0.640 / 0.811 |
 | Qwen | Combined, 4-bit | 0.927 / -- | 0.597 / 0.487 | 0.640 / 0.672 | 0.653 / 0.809 |
+| Llama | Wanda 50, mask-aware recovery | 0.930 / -- | 0.493 / 0.395 | 0.537 / 0.566 | 0.498 / 0.686 |
+| Llama | Wanda 2:4, mask-aware recovery | 0.824 / -- | 0.500 / 0.366 | 0.464 / 0.478 | 0.520 / 0.690 |
+| Llama | Wanda 4:8, mask-aware recovery | 0.893 / -- | 0.421 / 0.343 | 0.403 / 0.438 | 0.563 / 0.715 |
+| Llama | Magnitude 50, mask-aware recovery | 0.872 / -- | 0.479 / 0.338 | 0.514 / 0.557 | 0.537 / 0.679 |
+| Llama | Magnitude 2:4, mask-aware recovery | 0.898 / -- | 0.389 / 0.303 | 0.476 / 0.500 | 0.518 / 0.692 |
+| Llama | Magnitude 4:8, mask-aware recovery | 0.888 / -- | 0.479 / 0.364 | 0.526 / 0.561 | 0.557 / 0.704 |
 | Small (2048 tokens) | Llama-3.2-1B, r=32 | 0.898 / -- | 0.381 / 0.267 | 0.504 / 0.489 | 0.527 / 0.689 |
 | Small (2048 tokens) | DeepSeek-R1-1.5B, r=32 | 0.840 / -- | 0.351 / 0.238 | 0.418 / 0.444 | 0.474 / 0.624 |
 | Small (2048 tokens) | Qwen2.5-1.5B, r=32 | 0.936 / -- | 0.440 / 0.345 | 0.544 / 0.570 | 0.536 / 0.743 |
