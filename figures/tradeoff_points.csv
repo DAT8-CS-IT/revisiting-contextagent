@@ -1,25 +1,27 @@
-group,method,label,f1,peak_gb,avg_latency_s,degenerate,f1_source,cost_source
-dense,Dense (r=8),dense,0.735,15.6,9.0,0,Table 5 r=8 (seed 42),Table 4 / Table 9 16-bit
-quantisation,8-bit,8-bit,0.742,9.3,17.4,0,Table 8,Table 9
-quantisation,4-bit,4-bit,0.708,8.2,11.4,0,Table 8,Table 9
-combined,Combined 16-bit,r=32 1e-4,0.771,15.6,9.1,0,Table 10 (mean of 3 seeds),Table 11
-combined,Combined 4-bit,r=32 1e-4 4-bit,0.787,8.3,13.9,0,Table 10 (mean of 3 seeds),Table 11
-unstructured,Wanda,10%,0.715,15.6,8.7,0,Table 12,Table 13 (re-masked)
-unstructured,Wanda,30%,0.708,15.6,8.1,0,Table 12,Table 13 (re-masked)
-unstructured,Wanda,50%,0.634,15.7,8.2,0,Table 12 (mean of 3),Table 13 (re-masked)
-unstructured,Magnitude,10%,0.705,15.6,8.7,0,Table 12,Table 13 (re-masked)
-unstructured,Magnitude,30%,0.673,15.6,8.1,0,Table 12,Table 13 (re-masked)
-unstructured,Magnitude,50%,0.446,15.7,10.2,0,Table 12,Table 13 (re-masked)
-semi,Wanda N:M,2:4,0.469,15.7,8.7,0,Table 18 (mean of 3),Table 20
-semi,Wanda N:M,4:8,0.620,15.7,7.6,0,Table 18 (mean of 3),Table 20
-semi,Magnitude N:M,2:4,0.517,15.7,9.0,0,Table 18,Table 20
-semi,Magnitude N:M,4:8,0.544,15.7,8.2,0,Table 18,Table 20
-structured,Activation,10%,0.637,13.2,8.2,0,Table 12,Table 13
-structured,Activation,30%,0.481,8.9,5.4,0,Table 12,Table 13
-structured,Activation,50%,0.310,5.7,5.3,0,Table 12,Table 13
-structured,Magnitude (struct.),10%,0.468,13.3,34.8,1,Table 12,Table 13
-structured,Magnitude (struct.),30%,0.468,9.0,43.7,1,Table 12,Table 13
-structured,Magnitude (struct.),50%,0.468,5.7,31.4,1,Table 12,Table 13
-small,"LoRA r=32, 2048 tokens",Llama-3.2-1B,0.671,3.27,2.54,0,Section 7.3 (single run),costs.csv (r=32 run)
-small,"LoRA r=32, 2048 tokens",Qwen2.5-1.5B,0.707,3.82,3.67,0,Section 7.3 (single run),costs.csv (r=32 run)
-small,"LoRA r=32, 2048 tokens",DeepSeek-R1-1.5B,0.614,3.88,3.57,0,Section 7.3 (single run),costs.csv (r=32 run)
+group,method,label,f1,peak_gb,avg_latency_s,degenerate,f1_source,cost_source,tags
+dense,Dense (r=8),dense,0.735,15.6,9.0,0,Table 5 r=8 (seed 42),Table 4 / Table 9 16-bit,lora-exp__llama8b_lora_r8_all_lr50e5_e5
+quantisation,8-bit,8-bit,0.742,9.3,17.4,0,Table 8,Table 9,
+quantisation,4-bit,4-bit,0.708,8.2,11.4,0,Table 8,Table 9,
+combined,Combined 16-bit,r=32 1e-4,0.771,15.6,9.1,0,Table 10 (mean of 3 seeds),Table 11,
+combined,Combined 4-bit,r=32 1e-4 4-bit,0.787,8.3,13.9,0,Table 10 (mean of 3 seeds),Table 11,
+unstructured,Wanda,10%,0.715,15.6,8.7,0,Table 12,Table 13 (re-masked),
+unstructured,Wanda,30%,0.708,15.6,8.1,0,Table 12,Table 13 (re-masked),
+unstructured,Wanda,50%,0.634,15.7,8.2,0,Table 12 (mean of 3),Table 13 (re-masked),
+unstructured,Magnitude,10%,0.705,15.6,8.7,0,Table 12,Table 13 (re-masked),
+unstructured,Magnitude,30%,0.673,15.6,8.1,0,Table 12,Table 13 (re-masked),
+unstructured,Magnitude,50%,0.446,15.7,10.2,0,Table 12,Table 13 (re-masked),
+semi,Wanda N:M,2:4,0.469,15.7,8.7,0,Table 18 (mean of 3),Table 20,
+semi,Wanda N:M,4:8,0.620,15.7,7.6,0,Table 18 (mean of 3),Table 20,
+semi,Magnitude N:M,2:4,0.517,15.7,9.0,0,Table 18,Table 20,
+semi,Magnitude N:M,4:8,0.544,15.7,8.2,0,Table 18,Table 20,
+structured,Activation,10%,0.637,13.2,8.2,0,Table 12,Table 13,
+structured,Activation,30%,0.481,8.9,5.4,0,Table 12,Table 13,
+structured,Activation,50%,0.310,5.7,5.3,0,Table 12,Table 13,
+structured,Magnitude (struct.),10%,0.468,13.3,34.8,1,Table 12,Table 13,
+structured,Magnitude (struct.),30%,0.468,9.0,43.7,1,Table 12,Table 13,
+structured,Magnitude (struct.),50%,0.468,5.7,31.4,1,Table 12,Table 13,
+small,"LoRA r=32, 2048 tokens",Llama-3.2-1B,0.671,3.27,2.54,0,Section 7.3 (single run),costs.csv (r=32 run),
+small,"LoRA r=32, 2048 tokens",Qwen2.5-1.5B,0.707,3.82,3.67,0,Section 7.3 (single run),costs.csv (r=32 run),
+small,"LoRA r=32, 2048 tokens",DeepSeek-R1-1.5B,0.614,3.88,3.57,0,Section 7.3 (single run),costs.csv (r=32 run),
+maskaware,Wanda (mask-aware),50%,0.706,15.6,9.6,0,"Table 12/18 (mask-aware, r=8, 5e-5)",costs.csv (mask-aware run),llama3-8b-wanda-50-masked
+maskaware,Wanda (mask-aware),2:4,0.649,15.6,9.6,0,"Table 12/18 (mask-aware, r=8, 5e-5)",costs.csv (mask-aware run),llama3-8b-wanda-2:4-masked
